@@ -84,7 +84,7 @@ func (lim *Limiter) ReserveN(lv Level, now time.Time, n int) *Reservation {
 	return &Reservation{reserves}
 }
 
-func NewInf() *Limiter {
+func InfLimiter() *Limiter {
 	priorityRate := map[Level]float64{
 		undef: 100,
 	}
