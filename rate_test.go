@@ -126,7 +126,7 @@ func TestReserveN(t *testing.T) {
 
 func TestInf(t *testing.T) {
 	t.Run("delay", func(tt *testing.T) {
-		lim := NewInf()
+		lim := InfLimiter()
 		for i := 0; i < 1000; i += 1 {
 			var r *Reservation
 			if (i % 2) == 0 {
