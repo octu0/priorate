@@ -5,8 +5,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/octu0/priorate)](https://goreportcard.com/report/github.com/octu0/priorate)
 [![Releases](https://img.shields.io/github/v/release/octu0/priorate)](https://github.com/octu0/priorate/releases)
 
-`priorate` provides ratelimit with priority using [golang.org/x/time/rate](https://pkg.go.dev/golang.org/x/time/rate).  
-Priority can be defined as a ratio from 0.01 to 0.99, and ratelimit can be performed according to priority on a given limit.  
+`priorate` provides rate limiter with priority using [golang.org/x/time/rate](https://pkg.go.dev/golang.org/x/time/rate).  
+Priority can be defined as a ratio from 0.01 to 0.99, and rate limit can be performed according to priority on a given limit.  
 Fairly gets limit according to priority.
 
 ## Installation
@@ -21,23 +21,23 @@ Here's a quick example for using `priorate.NewLimiter`.
 
 ```go
 import(
-  "time"
-  "fmt"
+	"fmt"
+	"time"
 
-  "github.com/octu0/priorate"
+	"github.com/octu0/priorate"
 )
 
 func main() {
 	limit := priorate.NewLimiter(100,
-		priorate.Priority(High, 0.7),
-		priorate.Priority(Low, 0.3),
+		priorate.Priority(priorate.High, 0.7),
+		priorate.Priority(priorate.Low, 0.3),
 	)
 	for i := 0; i < 10; i += 1 {
 		if i < 5 {
-			high := limit.ReserveN(High, time.Now(), 30)
+			high := limit.ReserveN(priorate.High, time.Now(), 30)
 			printDelay(high.Delay())
 		} else {
-			low := limit.ReserveN(Low, time.Now(), 30)
+			low := limit.ReserveN(priorate.Low, time.Now(), 30)
 			printDelay(low.Delay())
 		}
 	}
