@@ -28,7 +28,7 @@ import(
 )
 
 func main() {
-  limit := priorate.NewLimiter(100,
+	limit := priorate.NewLimiter(100,
 		priorate.Priority(High, 0.7),
 		priorate.Priority(Low, 0.3),
 	)
