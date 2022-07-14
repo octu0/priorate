@@ -33,6 +33,10 @@ type Limiter struct {
 	limiter map[Level]*rate.Limiter
 }
 
+func (lim *Limiter) Limit() int {
+	return lim.limit
+}
+
 func (lim *Limiter) Reserve(lv Level) *Reservation {
 	return lim.ReserveN(lv, time.Now(), lim.limit)
 }
