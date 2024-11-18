@@ -84,18 +84,33 @@ func (lim *Limiter) ReserveN(lv Level, now time.Time, n int) *Reservation {
 	return &Reservation{reserves}
 }
 
-func InfLimiter() *Limiter {
-	priorityRate := map[Level]float64{
-		undef: 100,
+func (lim *Limiter) Clone() *Limiter {
+	clone := &Limiter{
+		limit:   lim.limit,
+		rate:    make(map[Level]float64, len(lim.rate)),
+		limiter: make(map[Level]*rate.Limiter, len(lim.limiter)),
 	}
-	priorityLimiter := map[Level]*rate.Limiter{
-		undef: rate.NewLimiter(rate.Inf, math.MaxInt),
+	for lv, r := range lim.rate {
+		clone.rate[lv] = r
 	}
-	return &Limiter{
-		limit:   math.MaxInt,
-		rate:    priorityRate,
-		limiter: priorityLimiter,
+	for lv, l := range lim.limiter {
+		clone.limiter[lv] = rate.NewLimiter(l.Limit(), l.Burst())
 	}
+	return clone
+}
+
+func (lim *Limiter) LevelRate(lv Level) float64 {
+	if r, ok := lim.rate[lv]; ok {
+		return r
+	}
+	return lim.rate[undef]
+}
+
+func (lim *Limiter) LevelLimit(lv Level) rate.Limit {
+	if l, ok := lim.limiter[lv]; ok {
+		return l.Limit()
+	}
+	return lim.limiter[undef].Limit()
 }
 
 func NewLimiter(limit int, funcs ...PriorityFunc) *Limiter {
@@ -129,6 +144,20 @@ func NewLimiter(limit int, funcs ...PriorityFunc) *Limiter {
 
 	return &Limiter{
 		limit:   limit,
+		rate:    priorityRate,
+		limiter: priorityLimiter,
+	}
+}
+
+func InfLimiter() *Limiter {
+	priorityRate := map[Level]float64{
+		undef: 100,
+	}
+	priorityLimiter := map[Level]*rate.Limiter{
+		undef: rate.NewLimiter(rate.Inf, math.MaxInt),
+	}
+	return &Limiter{
+		limit:   math.MaxInt,
 		rate:    priorityRate,
 		limiter: priorityLimiter,
 	}

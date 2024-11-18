@@ -144,3 +144,29 @@ func TestInf(t *testing.T) {
 		}
 	})
 }
+
+func TestClone(t *testing.T) {
+	lim1 := NewLimiter(100, Priority(High, 0.6), Priority(Low, 0.35))
+	lim2 := lim1.Clone()
+
+	if lim1.LevelRate(High) != lim2.LevelRate(High) {
+		t.Errorf("same level rate")
+	}
+	if lim1.LevelRate(Low) != lim2.LevelRate(Low) {
+		t.Errorf("same level rate")
+	}
+	if lim1.LevelLimit(High) != lim2.LevelLimit(High) {
+		t.Errorf("same level limit")
+	}
+	if lim1.LevelLimit(Low) != lim2.LevelLimit(Low) {
+		t.Errorf("same level limit")
+	}
+	t.Logf("undef rate %f == %f", lim1.LevelRate(undef), lim2.LevelRate(undef))
+	t.Logf("undef limit %v == %v", lim1.LevelLimit(undef), lim2.LevelLimit(undef))
+	if lim1.LevelRate(undef) != lim2.LevelRate(undef) {
+		t.Errorf("same undef rate")
+	}
+	if lim1.LevelLimit(undef) != lim2.LevelLimit(undef) {
+		t.Errorf("same undef limit")
+	}
+}
